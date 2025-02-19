@@ -14,6 +14,7 @@ import ImageBrowserModal from "@/components/ImageBrowserModal";
 import Image from "next/image";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
+import Footer from "@/components/Footer";
 
 export default function Home() {
   const [imageUrl, setImageUrl] = useState(
@@ -45,7 +46,7 @@ export default function Home() {
   );
 
   return (
-    <main className="min-h-screen flex items-center justify-center p-8 bg-gradient-to-br from-purple-50 to-pink-50 dark:from-gray-900 dark:to-gray-800">
+    <main className="min-h-screen flex flex-col items-center justify-center p-8 bg-gradient-to-br from-purple-50 to-pink-50 dark:from-gray-900 dark:to-gray-800">
       <button
         onClick={toggleDarkMode}
         className="fixed top-4 right-4 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
@@ -157,6 +158,8 @@ export default function Home() {
           </button>
         </form>
       </div>
+
+      <Footer />
 
       <ImageBrowserModal
         isOpen={isModalOpen}

@@ -4,6 +4,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { useTheme } from "@/context/ThemeContext";
 import SlidingPuzzle from "@/components/SlidingPuzzle";
 import { DEFAULT_GRID_SIZE } from "@/utils/puzzleUtils";
+import Footer from "@/components/Footer";
 
 export default function Game() {
   const searchParams = useSearchParams();
@@ -35,6 +36,8 @@ export default function Game() {
 
         <SlidingPuzzle imageUrl={imageUrl} gridSize={gridSize} />
       </div>
+
+      <Footer />
     </main>
   );
 }
