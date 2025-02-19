@@ -1,82 +1,89 @@
 "use client";
 
 import { useState } from "react";
-import SlidingPuzzle from "@/components/SlidingPuzzle";
+import { useRouter } from "next/navigation";
 import { useTheme } from "@/context/ThemeContext";
 import {
   DEFAULT_GRID_SIZE,
   MIN_GRID_SIZE,
   MAX_GRID_SIZE,
 } from "@/utils/puzzleUtils";
+import CustomSelect from "@/components/CustomSelect";
 
 export default function Home() {
   const [imageUrl, setImageUrl] = useState(
-    "https://source.unsplash.com/random/800x800"
+    "https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcRnzZU_IBmGoYCNB6pdQB3T2Z-t0-nXq0uIs2w-rs6uV8SAxwCt5LRgwmDk1vF6KKDKbl_cTnHEscdO2g10oYIQ9g"
   );
-  const [inputUrl, setInputUrl] = useState("");
   const [gridSize, setGridSize] = useState(DEFAULT_GRID_SIZE);
   const { isDarkMode, toggleDarkMode } = useTheme();
+  const router = useRouter();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (inputUrl.trim()) {
-      setImageUrl(inputUrl.trim());
-      setInputUrl("");
+    if (imageUrl.trim()) {
+      const params = new URLSearchParams({
+        imageUrl: imageUrl.trim(),
+        gridSize: gridSize.toString(),
+      });
+      router.push(`/game?${params.toString()}`);
     }
   };
 
+  const gridSizeOptions = Array.from(
+    { length: MAX_GRID_SIZE - MIN_GRID_SIZE + 1 },
+    (_, i) => ({
+      value: i + MIN_GRID_SIZE,
+      label: `${i + MIN_GRID_SIZE}x${i + MIN_GRID_SIZE}`,
+    })
+  );
+
   return (
-    <main className="min-h-screen p-8">
-      <div className="max-w-4xl mx-auto space-y-8">
-        <div className="flex justify-between items-center">
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+    <main className="min-h-screen flex items-center justify-center p-8 bg-gradient-to-br from-purple-50 to-pink-50 dark:from-gray-900 dark:to-gray-800">
+      <button
+        onClick={toggleDarkMode}
+        className="fixed top-4 right-4 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+      >
+        {isDarkMode ? "🌞" : "🌙"}
+      </button>
+
+      <div className="w-full max-w-md space-y-8 p-8 bg-white dark:bg-gray-900 rounded-2xl shadow-xl">
+        <div className="text-center">
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-2">
             Sliding Puzzle
           </h1>
-          <button
-            onClick={toggleDarkMode}
-            className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-          >
-            {isDarkMode ? "🌞" : "🌙"}
-          </button>
+          <p className="text-gray-600 dark:text-gray-400">
+            Create your custom sliding puzzle
+          </p>
         </div>
 
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
-          <form onSubmit={handleSubmit} className="flex-1 flex gap-4">
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="space-y-2">
+            <label className="text-sm font-medium block">Image URL</label>
             <input
               type="text"
-              value={inputUrl}
-              onChange={(e) => setInputUrl(e.target.value)}
+              value={imageUrl}
+              onChange={(e) => setImageUrl(e.target.value)}
               placeholder="Enter image URL..."
-              className="flex-1 px-4 py-2 rounded-lg border dark:border-gray-700 dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-purple-500"
+              className="w-full px-4 py-2 rounded-lg border dark:border-gray-700 dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-purple-500"
             />
-            <button
-              type="submit"
-              className="px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
-            >
-              Load Image
-            </button>
-          </form>
-
-          <div className="flex items-center gap-4">
-            <label className="text-sm font-medium">Grid Size:</label>
-            <select
-              value={gridSize}
-              onChange={(e) => setGridSize(Number(e.target.value))}
-              className="px-3 py-2 rounded-lg border dark:border-gray-700 dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-purple-500"
-            >
-              {Array.from(
-                { length: MAX_GRID_SIZE - MIN_GRID_SIZE + 1 },
-                (_, i) => i + MIN_GRID_SIZE
-              ).map((size) => (
-                <option key={size} value={size}>
-                  {size}x{size}
-                </option>
-              ))}
-            </select>
           </div>
-        </div>
 
-        <SlidingPuzzle imageUrl={imageUrl} gridSize={gridSize} />
+          <div className="space-y-2">
+            <label className="text-sm font-medium block">Grid Size</label>
+            <CustomSelect
+              value={gridSize}
+              onChange={setGridSize}
+              options={gridSizeOptions}
+            />
+          </div>
+
+          <button
+            type="submit"
+            className="w-full py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg hover:from-purple-700 hover:to-pink-700 transition-all duration-200 font-medium"
+          >
+            Start Game
+          </button>
+        </form>
       </div>
     </main>
   );
