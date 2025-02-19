@@ -9,4 +9,5 @@ export interface GameState {
   pieces: PuzzlePiece[];
   isComplete: boolean;
   imageUrl: string;
+  gridSize: number;
 }

@@ -1,18 +1,20 @@
 import { PuzzlePiece } from "@/types/puzzle";
 
-export const GRID_SIZE = 4;
-const TOTAL_PIECES = GRID_SIZE * GRID_SIZE;
+export const DEFAULT_GRID_SIZE = 4;
+export const MIN_GRID_SIZE = 2;
+export const MAX_GRID_SIZE = 8;
 
-export const createInitialPieces = (): PuzzlePiece[] => {
-  return Array.from({ length: TOTAL_PIECES }, (_, index) => ({
+export const createInitialPieces = (gridSize: number): PuzzlePiece[] => {
+  const totalPieces = gridSize * gridSize;
+  return Array.from({ length: totalPieces }, (_, index) => ({
     id: index,
     currentPosition: index,
     originalPosition: index,
-    isEmpty: index === TOTAL_PIECES - 1,
+    isEmpty: index === totalPieces - 1,
   }));
 };
 
-const isSolvable = (pieces: PuzzlePiece[]): boolean => {
+const isSolvable = (pieces: PuzzlePiece[], gridSize: number): boolean => {
   let inversions = 0;
   const values = pieces.filter((p) => !p.isEmpty).map((p) => p.currentPosition);
 
@@ -23,14 +25,17 @@ const isSolvable = (pieces: PuzzlePiece[]): boolean => {
   }
 
   const emptyRow = Math.floor(
-    pieces.find((p) => p.isEmpty)!.currentPosition / GRID_SIZE
+    pieces.find((p) => p.isEmpty)!.currentPosition / gridSize
   );
-  return GRID_SIZE % 2 === 0 && emptyRow % 2 === 0
+  return gridSize % 2 === 0 && emptyRow % 2 === 0
     ? inversions % 2 === 0
     : inversions % 2 === 1;
 };
 
-export const shufflePieces = (pieces: PuzzlePiece[]): PuzzlePiece[] => {
+export const shufflePieces = (
+  pieces: PuzzlePiece[],
+  gridSize: number
+): PuzzlePiece[] => {
   let shuffled: PuzzlePiece[];
   do {
     shuffled = [...pieces];
@@ -43,16 +48,20 @@ export const shufflePieces = (pieces: PuzzlePiece[]): PuzzlePiece[] => {
         ];
       }
     }
-  } while (!isSolvable(shuffled) || isPuzzleComplete(shuffled));
+  } while (!isSolvable(shuffled, gridSize) || isPuzzleComplete(shuffled));
 
   return shuffled;
 };
 
-export const isAdjacent = (pos1: number, pos2: number): boolean => {
-  const row1 = Math.floor(pos1 / GRID_SIZE);
-  const col1 = pos1 % GRID_SIZE;
-  const row2 = Math.floor(pos2 / GRID_SIZE);
-  const col2 = pos2 % GRID_SIZE;
+export const isAdjacent = (
+  pos1: number,
+  pos2: number,
+  gridSize: number
+): boolean => {
+  const row1 = Math.floor(pos1 / gridSize);
+  const col1 = pos1 % gridSize;
+  const row2 = Math.floor(pos2 / gridSize);
+  const col2 = pos2 % gridSize;
 
   return Math.abs(row1 - row2) + Math.abs(col1 - col2) === 1;
 };
@@ -64,8 +73,8 @@ export const isPuzzleComplete = (pieces: PuzzlePiece[]): boolean => {
 };
 
 export const calculatePosition = (position: number) => {
-  const row = Math.floor(position / GRID_SIZE);
-  const col = position % GRID_SIZE;
+  const row = Math.floor(position / DEFAULT_GRID_SIZE);
+  const col = position % DEFAULT_GRID_SIZE;
   return {
     x: col * 100,
     y: row * 100,

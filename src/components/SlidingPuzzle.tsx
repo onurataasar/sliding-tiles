@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import { PuzzlePiece, GameState } from "@/types/puzzle";
 import {
-  GRID_SIZE,
   createInitialPieces,
   shufflePieces,
   isAdjacent,
@@ -13,23 +12,26 @@ import { useTheme } from "@/context/ThemeContext";
 
 interface Props {
   imageUrl: string;
+  gridSize: number;
 }
 
-export default function SlidingPuzzle({ imageUrl }: Props) {
+export default function SlidingPuzzle({ imageUrl, gridSize }: Props) {
   const [gameState, setGameState] = useState<GameState>({
-    pieces: createInitialPieces(),
+    pieces: createInitialPieces(gridSize),
     isComplete: false,
     imageUrl,
+    gridSize,
   });
   const { isDarkMode } = useTheme();
 
   useEffect(() => {
     setGameState(() => ({
-      pieces: shufflePieces(createInitialPieces()),
+      pieces: shufflePieces(createInitialPieces(gridSize), gridSize),
       isComplete: false,
       imageUrl,
+      gridSize,
     }));
-  }, [imageUrl]);
+  }, [imageUrl, gridSize]);
 
   const handlePieceClick = (clickedPiece: PuzzlePiece) => {
     if (clickedPiece.isEmpty) return;
@@ -37,7 +39,11 @@ export default function SlidingPuzzle({ imageUrl }: Props) {
     const emptyPiece = gameState.pieces.find((p) => p.isEmpty);
     if (
       !emptyPiece ||
-      !isAdjacent(clickedPiece.currentPosition, emptyPiece.currentPosition)
+      !isAdjacent(
+        clickedPiece.currentPosition,
+        emptyPiece.currentPosition,
+        gridSize
+      )
     )
       return;
 
@@ -82,20 +88,20 @@ export default function SlidingPuzzle({ imageUrl }: Props) {
               hover:shadow-lg`}
             style={{
               position: "absolute",
-              left: `${
-                (piece.currentPosition % GRID_SIZE) * (100 / GRID_SIZE)
-              }%`,
+              left: `${(piece.currentPosition % gridSize) * (100 / gridSize)}%`,
               top: `${
-                Math.floor(piece.currentPosition / GRID_SIZE) *
-                (100 / GRID_SIZE)
+                Math.floor(piece.currentPosition / gridSize) * (100 / gridSize)
               }%`,
-              width: `${100 / GRID_SIZE}%`,
-              height: `${100 / GRID_SIZE}%`,
+              width: `${100 / gridSize}%`,
+              height: `${100 / gridSize}%`,
               backgroundImage: `url(${gameState.imageUrl})`,
-              backgroundSize: "400% 400%",
+              backgroundSize: `${gridSize * 100}% ${gridSize * 100}%`,
               backgroundPosition: `${
-                (piece.originalPosition % GRID_SIZE) * 33.33
-              }% ${Math.floor(piece.originalPosition / GRID_SIZE) * 33.33}%`,
+                (piece.originalPosition % gridSize) * (100 / (gridSize - 1))
+              }% ${
+                Math.floor(piece.originalPosition / gridSize) *
+                (100 / (gridSize - 1))
+              }%`,
             }}
           />
         );
