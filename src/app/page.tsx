@@ -3,19 +3,25 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTheme } from "@/context/ThemeContext";
-import { FaDice } from "react-icons/fa";
+import { FaDice, FaImages } from "react-icons/fa";
 import {
   DEFAULT_GRID_SIZE,
   MIN_GRID_SIZE,
   MAX_GRID_SIZE,
 } from "@/utils/puzzleUtils";
 import CustomSelect from "@/components/CustomSelect";
+import ImageBrowserModal from "@/components/ImageBrowserModal";
+import Image from "next/image";
+import Skeleton from "react-loading-skeleton";
+import "react-loading-skeleton/dist/skeleton.css";
 
 export default function Home() {
   const [imageUrl, setImageUrl] = useState(
     "https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcRnzZU_IBmGoYCNB6pdQB3T2Z-t0-nXq0uIs2w-rs6uV8SAxwCt5LRgwmDk1vF6KKDKbl_cTnHEscdO2g10oYIQ9g"
   );
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [gridSize, setGridSize] = useState(DEFAULT_GRID_SIZE);
+  const [isImageLoading, setIsImageLoading] = useState(true);
   const { isDarkMode, toggleDarkMode } = useTheme();
   const router = useRouter();
 
@@ -80,17 +86,59 @@ export default function Home() {
             </div>
           </div>
 
-          <button
-            type="button"
-            onClick={() =>
-              setImageUrl(
-                `https://picsum.photos/800/800?random=${Math.random()}`
-              )
-            }
-            className="w-full p-2 text-sm rounded-lg border dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors flex items-center justify-center gap-2"
-          >
-            <FaDice className="text-lg" /> Choose Random Image
-          </button>
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={() =>
+                setImageUrl(
+                  `https://picsum.photos/800/800?random=${Math.random()}`
+                )
+              }
+              className="flex-1 p-2 text-sm rounded-lg border dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors flex items-center justify-center gap-2"
+            >
+              <FaDice className="text-lg" /> Random
+            </button>
+            <button
+              type="button"
+              onClick={() => setIsModalOpen(true)}
+              className="flex-1 p-2 text-sm rounded-lg border dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors flex items-center justify-center gap-2"
+            >
+              <FaImages className="text-lg" /> Browse
+            </button>
+          </div>
+
+          {imageUrl && (
+            <div className="relative aspect-square rounded-lg overflow-hidden border dark:border-gray-700">
+              {isImageLoading && (
+                <div className="absolute inset-0 z-10">
+                  <Skeleton
+                    className="h-full w-full"
+                    baseColor={isDarkMode ? "#374151" : "#f3f4f6"}
+                    highlightColor={isDarkMode ? "#4b5563" : "#e5e7eb"}
+                  />
+                </div>
+              )}
+              <Image
+                src={imageUrl}
+                alt="Selected puzzle image"
+                fill
+                className="object-cover"
+                sizes="(max-width: 768px) 100vw, 400px"
+                priority
+                unoptimized
+                onLoadingComplete={() => setIsImageLoading(false)}
+                onLoad={() => setIsImageLoading(false)}
+                onError={(e) => {
+                  const img = e.target as HTMLImageElement;
+                  img.style.display = "none";
+                  setTimeout(() => {
+                    img.style.display = "block";
+                    setIsImageLoading(false);
+                  }, 100);
+                }}
+              />
+            </div>
+          )}
 
           <div className="space-y-2">
             <label className="text-sm font-medium block">Grid Size</label>
@@ -109,6 +157,12 @@ export default function Home() {
           </button>
         </form>
       </div>
+
+      <ImageBrowserModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSelect={setImageUrl}
+      />
     </main>
   );
 }
