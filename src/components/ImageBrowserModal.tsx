@@ -26,11 +26,12 @@ export default function ImageBrowserModal({
   const { isDarkMode } = useTheme();
 
   const loadImages = () => {
-    const newImages = Array.from(
-      { length: 24 },
-      () => `https://picsum.photos/800/800?random=${Math.random()}`
-    );
-    // Initialize loading states for new images
+    const newImages = Array.from({ length: 24 }, (_, index) => {
+      const timestamp = Date.now() + index;
+      const seed = Math.floor(Math.random() * 1000);
+      return `https://picsum.photos/seed/${seed}_${timestamp}/800/800`;
+    });
+
     const newLoadingStates = newImages.reduce((acc, url) => {
       acc[url] = true;
       return acc;
