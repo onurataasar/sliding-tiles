@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTheme } from "@/context/ThemeContext";
+import { FaDice } from "react-icons/fa";
 import {
   DEFAULT_GRID_SIZE,
   MIN_GRID_SIZE,
@@ -67,6 +68,29 @@ export default function Home() {
               className="w-full px-4 py-2 rounded-lg border dark:border-gray-700 dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-purple-500"
             />
           </div>
+
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-gray-300 dark:border-gray-700" />
+            </div>
+            <div className="relative flex justify-center text-sm">
+              <span className="px-2 text-gray-500 bg-white dark:bg-gray-900">
+                or
+              </span>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            onClick={() =>
+              setImageUrl(
+                `https://picsum.photos/800/800?random=${Math.random()}`
+              )
+            }
+            className="w-full p-2 text-sm rounded-lg border dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors flex items-center justify-center gap-2"
+          >
+            <FaDice className="text-lg" /> Choose Random Image
+          </button>
 
           <div className="space-y-2">
             <label className="text-sm font-medium block">Grid Size</label>
