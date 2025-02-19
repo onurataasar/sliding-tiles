@@ -44,7 +44,7 @@ export default function ImageBrowserModal({
     if (isOpen && images.length === 0) {
       setImages(loadImages());
     }
-  }, [isOpen]);
+  }, [isOpen, images.length]);
 
   const handleOutsideClick = (e: React.MouseEvent) => {
     if (modalRef.current && !modalRef.current.contains(e.target as Node)) {
