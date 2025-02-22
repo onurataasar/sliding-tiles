@@ -6,6 +6,7 @@ import SlidingPuzzle from "@/components/SlidingPuzzle";
 import { DEFAULT_GRID_SIZE } from "@/utils/puzzleUtils";
 import Footer from "@/components/Footer";
 import { Suspense, useState, useEffect } from "react";
+import EndGameModal from "@/components/EndGameModal";
 
 function formatTime(seconds: number): string {
   const mins = Math.floor(seconds / 60);
@@ -21,6 +22,8 @@ function GameContent() {
   const { isDarkMode, toggleDarkMode } = useTheme();
   const [time, setTime] = useState(0);
   const [isGameOver, setIsGameOver] = useState(false);
+  const [moves, setMoves] = useState(0);
+  const [isSuccess, setIsSuccess] = useState(false);
 
   const imageUrl =
     searchParams.get("imageUrl") ||
@@ -38,6 +41,7 @@ function GameContent() {
           const newTime = prev + 1;
           if (newTime >= timeLimit) {
             setIsGameOver(true);
+            setIsSuccess(false);
             return timeLimit;
           }
           return newTime;
@@ -52,6 +56,24 @@ function GameContent() {
 
   const handleGameComplete = () => {
     setIsGameOver(true);
+    setIsSuccess(true);
+  };
+
+  const handleMoveCount = (count: number) => {
+    setMoves(count);
+  };
+
+  const handleRestart = () => {
+    window.location.reload();
+  };
+
+  const handleRandomRestart = () => {
+    const params = new URLSearchParams(searchParams);
+    params.set(
+      "imageUrl",
+      `https://picsum.photos/800/800?random=${Math.random()}`
+    );
+    router.push(`/game?${params.toString()}`);
   };
 
   return (
@@ -85,30 +107,18 @@ function GameContent() {
         gridSize={gridSize}
         mode={mode}
         onComplete={handleGameComplete}
+        onMoveCount={handleMoveCount}
       />
 
-      {isGameOver && timeLimit && time >= timeLimit && (
-        <div className="fixed inset-0 bg-black/70 flex items-center justify-center">
-          <div className="bg-white dark:bg-gray-800 p-8 rounded-2xl text-center space-y-4">
-            <h2 className="text-2xl font-bold">Time&apos;s Up!</h2>
-            <p>You ran out of time. Want to try again?</p>
-            <div className="flex gap-4 justify-center">
-              <button
-                onClick={() => router.push("/")}
-                className="px-4 py-2 rounded-lg bg-purple-600 text-white hover:bg-purple-700 transition-colors"
-              >
-                Back to Setup
-              </button>
-              <button
-                onClick={() => window.location.reload()}
-                className="px-4 py-2 rounded-lg border hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-              >
-                Retry
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <EndGameModal
+        isOpen={isGameOver}
+        onRestart={handleRestart}
+        onRandomRestart={handleRandomRestart}
+        onBackToSetup={() => router.push("/")}
+        time={time}
+        moves={moves}
+        isSuccess={isSuccess}
+      />
     </div>
   );
 }

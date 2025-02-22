@@ -15,6 +15,7 @@ interface Props {
   gridSize: number;
   mode: "sliding" | "puzzle";
   onComplete?: () => void;
+  onMoveCount?: (count: number) => void;
 }
 
 export default function SlidingPuzzle({
@@ -22,6 +23,7 @@ export default function SlidingPuzzle({
   gridSize,
   mode,
   onComplete,
+  onMoveCount,
 }: Props) {
   const [gameState, setGameState] = useState<GameState>({
     pieces: createInitialPieces(gridSize),
@@ -30,6 +32,7 @@ export default function SlidingPuzzle({
     gridSize,
   });
   const [selectedPiece, setSelectedPiece] = useState<PuzzlePiece | null>(null);
+  const [moveCount, setMoveCount] = useState(0);
   const { isDarkMode } = useTheme();
 
   useEffect(() => {
@@ -40,6 +43,7 @@ export default function SlidingPuzzle({
       gridSize,
     }));
     setSelectedPiece(null);
+    setMoveCount(0);
   }, [imageUrl, gridSize]);
 
   useEffect(() => {
@@ -47,6 +51,12 @@ export default function SlidingPuzzle({
       onComplete();
     }
   }, [gameState.isComplete, onComplete]);
+
+  useEffect(() => {
+    if (onMoveCount) {
+      onMoveCount(moveCount);
+    }
+  }, [moveCount, onMoveCount]);
 
   const handlePieceClick = (clickedPiece: PuzzlePiece) => {
     if (mode === "sliding") {
@@ -75,6 +85,7 @@ export default function SlidingPuzzle({
 
       const isComplete = isPuzzleComplete(newPieces);
       setGameState({ ...gameState, pieces: newPieces, isComplete });
+      setMoveCount((prev) => prev + 1);
     } else {
       // Regular puzzle mode - swap any two pieces
       if (selectedPiece === null) {
@@ -93,6 +104,7 @@ export default function SlidingPuzzle({
         const isComplete = isPuzzleComplete(newPieces);
         setGameState({ ...gameState, pieces: newPieces, isComplete });
         setSelectedPiece(null);
+        setMoveCount((prev) => prev + 1);
       }
     }
   };
