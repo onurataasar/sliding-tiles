@@ -7,6 +7,8 @@ import { DEFAULT_GRID_SIZE } from "@/utils/puzzleUtils";
 import Footer from "@/components/Footer";
 import { Suspense, useState, useEffect } from "react";
 import EndGameModal from "@/components/EndGameModal";
+import LoadingScreen from "@/components/LoadingScreen";
+import { FaChevronLeft } from "react-icons/fa6";
 
 function formatTime(seconds: number): string {
   const mins = Math.floor(seconds / 60);
@@ -81,9 +83,15 @@ function GameContent() {
       <div className="flex justify-between items-center">
         <button
           onClick={() => router.push("/")}
-          className="text-sm font-medium px-4 py-2 rounded-lg hover:bg-white/10 dark:hover:bg-black/10 transition-colors"
+          className="group flex items-center gap-2 px-4 py-2.5 text-sm font-medium rounded-xl bg-white/10 hover:bg-white/20 dark:bg-black/10 dark:hover:bg-black/20 transition-all duration-200 hover:scale-105"
         >
-          ← Back to Setup
+          <FaChevronLeft
+            size={14}
+            className="transform transition-transform group-hover:-translate-x-1 text-purple-600 dark:text-purple-400 text-base mt-[1px]"
+          />
+          <span className="text-purple-600 dark:text-purple-400">
+            Back to Setup
+          </span>
         </button>
         <div className="flex items-center gap-4">
           <div
@@ -125,11 +133,11 @@ function GameContent() {
 
 export default function Game() {
   return (
-    <main className="min-h-screen p-8 pb-24 bg-gradient-to-br from-purple-50 to-pink-50 dark:from-gray-900 dark:to-gray-800">
-      <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<LoadingScreen />}>
+      <main className="min-h-screen p-8 pb-24 bg-gradient-to-br from-purple-50 to-pink-50 dark:from-gray-900 dark:to-gray-800">
         <GameContent />
-      </Suspense>
-      <Footer />
-    </main>
+        <Footer />
+      </main>
+    </Suspense>
   );
 }
