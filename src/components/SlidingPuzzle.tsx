@@ -13,15 +13,17 @@ import { useTheme } from "@/context/ThemeContext";
 interface Props {
   imageUrl: string;
   gridSize: number;
+  mode: "sliding" | "puzzle";
 }
 
-export default function SlidingPuzzle({ imageUrl, gridSize }: Props) {
+export default function SlidingPuzzle({ imageUrl, gridSize, mode }: Props) {
   const [gameState, setGameState] = useState<GameState>({
     pieces: createInitialPieces(gridSize),
     isComplete: false,
     imageUrl,
     gridSize,
   });
+  const [selectedPiece, setSelectedPiece] = useState<PuzzlePiece | null>(null);
   const { isDarkMode } = useTheme();
 
   useEffect(() => {
@@ -31,34 +33,56 @@ export default function SlidingPuzzle({ imageUrl, gridSize }: Props) {
       imageUrl,
       gridSize,
     }));
+    setSelectedPiece(null);
   }, [imageUrl, gridSize]);
 
   const handlePieceClick = (clickedPiece: PuzzlePiece) => {
-    if (clickedPiece.isEmpty) return;
+    if (mode === "sliding") {
+      if (clickedPiece.isEmpty) return;
 
-    const emptyPiece = gameState.pieces.find((p) => p.isEmpty);
-    if (
-      !emptyPiece ||
-      !isAdjacent(
-        clickedPiece.currentPosition,
-        emptyPiece.currentPosition,
-        gridSize
+      const emptyPiece = gameState.pieces.find((p) => p.isEmpty);
+      if (
+        !emptyPiece ||
+        !isAdjacent(
+          clickedPiece.currentPosition,
+          emptyPiece.currentPosition,
+          gridSize
+        )
       )
-    )
-      return;
+        return;
 
-    const newPieces = gameState.pieces.map((piece) => {
-      if (piece.id === clickedPiece.id) {
-        return { ...piece, currentPosition: emptyPiece.currentPosition };
-      }
-      if (piece.id === emptyPiece.id) {
-        return { ...piece, currentPosition: clickedPiece.currentPosition };
-      }
-      return piece;
-    });
+      const newPieces = gameState.pieces.map((piece) => {
+        if (piece.id === clickedPiece.id) {
+          return { ...piece, currentPosition: emptyPiece.currentPosition };
+        }
+        if (piece.id === emptyPiece.id) {
+          return { ...piece, currentPosition: clickedPiece.currentPosition };
+        }
+        return piece;
+      });
 
-    const isComplete = isPuzzleComplete(newPieces);
-    setGameState({ ...gameState, pieces: newPieces, isComplete });
+      const isComplete = isPuzzleComplete(newPieces);
+      setGameState({ ...gameState, pieces: newPieces, isComplete });
+    } else {
+      // Regular puzzle mode - swap any two pieces
+      if (selectedPiece === null) {
+        setSelectedPiece(clickedPiece);
+      } else {
+        const newPieces = gameState.pieces.map((piece) => {
+          if (piece.id === clickedPiece.id) {
+            return { ...piece, currentPosition: selectedPiece.currentPosition };
+          }
+          if (piece.id === selectedPiece.id) {
+            return { ...piece, currentPosition: clickedPiece.currentPosition };
+          }
+          return piece;
+        });
+
+        const isComplete = isPuzzleComplete(newPieces);
+        setGameState({ ...gameState, pieces: newPieces, isComplete });
+        setSelectedPiece(null);
+      }
+    }
   };
 
   return (
@@ -68,7 +92,7 @@ export default function SlidingPuzzle({ imageUrl, gridSize }: Props) {
       }`}
     >
       {gameState.pieces.map((piece) => {
-        if (piece.isEmpty) return null;
+        if (piece.isEmpty && mode === "sliding") return null;
 
         return (
           <div
@@ -84,6 +108,11 @@ export default function SlidingPuzzle({ imageUrl, gridSize }: Props) {
                 isDarkMode
                   ? "hover:shadow-purple-500/30"
                   : "hover:shadow-black/20"
+              }
+              ${
+                selectedPiece?.id === piece.id
+                  ? "ring-2 ring-purple-500 z-20"
+                  : ""
               }
               hover:shadow-lg`}
             style={{

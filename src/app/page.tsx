@@ -23,6 +23,7 @@ export default function Home() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [gridSize, setGridSize] = useState(DEFAULT_GRID_SIZE);
   const [isImageLoading, setIsImageLoading] = useState(true);
+  const [gameMode, setGameMode] = useState("sliding");
   const { isDarkMode, toggleDarkMode } = useTheme();
   const router = useRouter();
 
@@ -32,6 +33,7 @@ export default function Home() {
       const params = new URLSearchParams({
         imageUrl: imageUrl.trim(),
         gridSize: gridSize.toString(),
+        mode: gameMode,
       });
       router.push(`/game?${params.toString()}`);
     }
@@ -148,6 +150,34 @@ export default function Home() {
               onChange={setGridSize}
               options={gridSizeOptions}
             />
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-sm font-medium block">Game Mode</label>
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={() => setGameMode("sliding")}
+                className={`flex-1 p-2 text-sm rounded-lg border transition-colors ${
+                  gameMode === "sliding"
+                    ? "bg-purple-600 text-white border-purple-600"
+                    : "dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800"
+                }`}
+              >
+                Sliding Tiles
+              </button>
+              <button
+                type="button"
+                onClick={() => setGameMode("puzzle")}
+                className={`flex-1 p-2 text-sm rounded-lg border transition-colors ${
+                  gameMode === "puzzle"
+                    ? "bg-purple-600 text-white border-purple-600"
+                    : "dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800"
+                }`}
+              >
+                Regular Puzzle
+              </button>
+            </div>
           </div>
 
           <button

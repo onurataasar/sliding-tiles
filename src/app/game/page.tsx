@@ -16,6 +16,7 @@ function GameContent() {
     searchParams.get("imageUrl") ||
     "https://source.unsplash.com/random/800x800";
   const gridSize = Number(searchParams.get("gridSize")) || DEFAULT_GRID_SIZE;
+  const mode = (searchParams.get("mode") || "sliding") as "sliding" | "puzzle";
 
   return (
     <div className="max-w-4xl mx-auto space-y-8">
@@ -34,7 +35,7 @@ function GameContent() {
         </button>
       </div>
 
-      <SlidingPuzzle imageUrl={imageUrl} gridSize={gridSize} />
+      <SlidingPuzzle imageUrl={imageUrl} gridSize={gridSize} mode={mode} />
     </div>
   );
 }
