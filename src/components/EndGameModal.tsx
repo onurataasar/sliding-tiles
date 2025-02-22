@@ -1,4 +1,5 @@
-import { FaRandom, FaShare, FaRedo, FaHome } from "react-icons/fa";
+import { FaArrowRotateLeft, FaDiceFive, FaHouse } from "react-icons/fa6";
+import { FaCopy, FaWhatsapp, FaXTwitter, FaFacebook } from "react-icons/fa6";
 
 interface EndGameModalProps {
   isOpen: boolean;
@@ -29,27 +30,49 @@ export default function EndGameModal({
       .padStart(2, "0")}`;
   };
 
-  const handleShare = async () => {
+  const getShareUrl = () => {
+    const url = new URL(window.location.href);
+    const params = new URLSearchParams(url.search);
+    if (!params.has("imageUrl")) {
+      params.set("imageUrl", window.location.href.split("?")[0]);
+    }
+    return `https://sliding-tiles-eight.vercel.app${
+      url.pathname
+    }?${params.toString()}`;
+  };
+
+  const handleCopyLink = async () => {
     try {
-      // Get current URL and preserve all parameters
-      const url = new URL(window.location.href);
-      const params = new URLSearchParams(url.search);
-
-      // Ensure all required parameters are present
-      if (!params.has("imageUrl")) {
-        params.set("imageUrl", window.location.href.split("?")[0]); // fallback to current URL
-      }
-
-      const shareUrl = `${window.location.origin}${
-        window.location.pathname
-      }?${params.toString()}`;
-      await navigator.clipboard.writeText(shareUrl);
-      alert(
-        "Link copied to clipboard! Share it with your friends to challenge them with the same puzzle!"
-      );
+      await navigator.clipboard.writeText(getShareUrl());
+      alert("Link copied to clipboard! Share it with your friends!");
     } catch (err) {
       console.error("Failed to copy link:", err);
     }
+  };
+
+  const shareText = `I just ${
+    isSuccess ? "solved" : "played"
+  } this puzzle in ${formatTime(time)} with ${moves} moves! Can you beat me?`;
+
+  const handleWhatsAppShare = () => {
+    const url = `https://wa.me/?text=${encodeURIComponent(
+      `${shareText} ${getShareUrl()}`
+    )}`;
+    window.open(url, "_blank");
+  };
+
+  const handleTwitterShare = () => {
+    const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(
+      shareText
+    )}&url=${encodeURIComponent(getShareUrl())}`;
+    window.open(url, "_blank");
+  };
+
+  const handleFacebookShare = () => {
+    const url = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
+      getShareUrl()
+    )}`;
+    window.open(url, "_blank");
   };
 
   return (
@@ -74,29 +97,60 @@ export default function EndGameModal({
         <div className="grid grid-cols-2 gap-3">
           <button
             onClick={onRestart}
-            className="flex items-center justify-center gap-2 p-3 rounded-lg bg-purple-600 text-white hover:bg-purple-700 transition-colors"
+            className="h-12 flex items-center justify-center gap-2 p-3 rounded-lg bg-purple-600 text-white hover:bg-purple-700 transition-colors"
           >
-            <FaRedo /> Try Again
+            <FaArrowRotateLeft className="text-xl" /> Try Again
           </button>
           <button
             onClick={onRandomRestart}
-            className="flex items-center justify-center gap-2 p-3 rounded-lg bg-pink-600 text-white hover:bg-pink-700 transition-colors"
+            className="h-12 flex items-center justify-center gap-2 p-3 rounded-lg bg-pink-600 text-white hover:bg-pink-700 transition-colors"
           >
-            <FaRandom /> Random Image
-          </button>
-          <button
-            onClick={handleShare}
-            className="flex items-center justify-center gap-2 p-3 rounded-lg border dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-          >
-            <FaShare /> Share Link
-          </button>
-          <button
-            onClick={onBackToSetup}
-            className="flex items-center justify-center gap-2 p-3 rounded-lg border dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-          >
-            <FaHome /> Back to Setup
+            <FaDiceFive className="text-xl" /> Random Image
           </button>
         </div>
+
+        <div className="space-y-3">
+          <p className="text-sm text-gray-600 dark:text-gray-400">
+            Share your result:
+          </p>
+          <div className="flex justify-center gap-3">
+            <button
+              onClick={handleWhatsAppShare}
+              className="w-12 h-12 flex items-center justify-center rounded-lg bg-green-500 text-white hover:bg-green-600 transition-colors"
+              title="Share on WhatsApp"
+            >
+              <FaWhatsapp className="text-xl" />
+            </button>
+            <button
+              onClick={handleTwitterShare}
+              className="w-12 h-12 flex items-center justify-center rounded-lg bg-black text-white hover:bg-gray-900 transition-colors"
+              title="Share on X (Twitter)"
+            >
+              <FaXTwitter className="text-2xl" />
+            </button>
+            <button
+              onClick={handleFacebookShare}
+              className="w-12 h-12 flex items-center justify-center rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors"
+              title="Share on Facebook"
+            >
+              <FaFacebook className="text-xl" />
+            </button>
+            <button
+              onClick={handleCopyLink}
+              className="w-12 h-12 flex items-center justify-center rounded-lg border dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+              title="Copy Link"
+            >
+              <FaCopy className="text-xl" />
+            </button>
+          </div>
+        </div>
+
+        <button
+          onClick={onBackToSetup}
+          className="h-12 w-full flex items-center justify-center gap-2 p-3 rounded-lg border dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+        >
+          <FaHouse className="text-xl" /> Back to Setup
+        </button>
       </div>
     </div>
   );
