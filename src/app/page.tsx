@@ -24,6 +24,7 @@ export default function Home() {
   const [gridSize, setGridSize] = useState(DEFAULT_GRID_SIZE);
   const [isImageLoading, setIsImageLoading] = useState(true);
   const [gameMode, setGameMode] = useState("sliding");
+  const [timeLimit, setTimeLimit] = useState<number | null>(null);
   const { isDarkMode, toggleDarkMode } = useTheme();
   const router = useRouter();
 
@@ -34,6 +35,7 @@ export default function Home() {
         imageUrl: imageUrl.trim(),
         gridSize: gridSize.toString(),
         mode: gameMode,
+        timeLimit: timeLimit?.toString() || "",
       });
       router.push(`/game?${params.toString()}`);
     }
@@ -46,6 +48,14 @@ export default function Home() {
       label: `${i + MIN_GRID_SIZE}x${i + MIN_GRID_SIZE}`,
     })
   );
+
+  const timeLimitOptions = [
+    { value: null, label: "No Limit" },
+    { value: 60, label: "1 minute" },
+    { value: 180, label: "3 minutes" },
+    { value: 300, label: "5 minutes" },
+    { value: 600, label: "10 minutes" },
+  ];
 
   return (
     <main className="min-h-screen flex flex-col items-center justify-center p-8 pb-24 bg-gradient-to-br from-purple-50 to-pink-50 dark:from-gray-900 dark:to-gray-800">
@@ -109,10 +119,21 @@ export default function Home() {
 
             <div className="space-y-4">
               <label className="text-sm font-medium block">Grid Size</label>
-              <CustomSelect
+              <CustomSelect<number>
                 value={gridSize}
                 onChange={setGridSize}
                 options={gridSizeOptions}
+              />
+            </div>
+
+            <div className="space-y-4">
+              <label className="text-sm font-medium block">
+                Time Challenge
+              </label>
+              <CustomSelect<number | null>
+                value={timeLimit}
+                onChange={setTimeLimit}
+                options={timeLimitOptions}
               />
             </div>
 

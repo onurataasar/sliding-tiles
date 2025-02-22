@@ -3,18 +3,22 @@
 import { useState, useRef, useEffect } from "react";
 import { HiChevronDown, HiChevronUp } from "react-icons/hi";
 
-interface Option {
-  value: number;
+interface Option<T extends string | number | null> {
+  value: T;
   label: string;
 }
 
-interface Props {
-  value: number;
-  onChange: (value: number) => void;
-  options: Option[];
+interface Props<T extends string | number | null> {
+  value: T;
+  onChange: (value: T) => void;
+  options: Option<T>[];
 }
 
-export default function CustomSelect({ value, onChange, options }: Props) {
+export default function CustomSelect<T extends string | number | null>({
+  value,
+  onChange,
+  options,
+}: Props<T>) {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 

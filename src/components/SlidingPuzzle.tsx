@@ -14,9 +14,15 @@ interface Props {
   imageUrl: string;
   gridSize: number;
   mode: "sliding" | "puzzle";
+  onComplete?: () => void;
 }
 
-export default function SlidingPuzzle({ imageUrl, gridSize, mode }: Props) {
+export default function SlidingPuzzle({
+  imageUrl,
+  gridSize,
+  mode,
+  onComplete,
+}: Props) {
   const [gameState, setGameState] = useState<GameState>({
     pieces: createInitialPieces(gridSize),
     isComplete: false,
@@ -35,6 +41,12 @@ export default function SlidingPuzzle({ imageUrl, gridSize, mode }: Props) {
     }));
     setSelectedPiece(null);
   }, [imageUrl, gridSize]);
+
+  useEffect(() => {
+    if (gameState.isComplete && onComplete) {
+      onComplete();
+    }
+  }, [gameState.isComplete, onComplete]);
 
   const handlePieceClick = (clickedPiece: PuzzlePiece) => {
     if (mode === "sliding") {
